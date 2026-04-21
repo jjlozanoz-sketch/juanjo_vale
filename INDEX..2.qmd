@@ -435,7 +435,3 @@ ggplot(tabla_asistencia, aes(x = Intervalo, y = fi)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
-```{r}
-
-```
