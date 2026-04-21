@@ -1,0 +1,441 @@
+---
+title: "DISTRIBUCIONES DE FRECUENCIAS"
+subtitle: "TALLER 1"
+author: 
+  - name: JUAN JOSE LOZANO <br>VALERIE RINCON 
+    affiliation: "Universidad del Tolima"
+    affiliation-url: "https://www.ut.edu.co/"
+date: today
+lang: es
+title-block-banner: "#761125"
+
+format:
+  html:
+    page-layout: full
+    fontsize: 14pt
+    toc: true
+    toc-location: right
+    number-sections: true
+    code-fold: true
+    code-summary: "Ver código"
+    theme: dark
+    highlight-style: monokai
+    html-math-method: katex
+    smooth-scroll: true
+    link-external-newwindow: true
+    code-overflow: scroll
+    favicon: favicon.ico
+    
+editor: visual
+
+knitr:
+  opts_chunk:
+    message: false
+    warning: false
+    fig.align: center
+    fig.width: 6
+    fig.height: 6
+    out.width: "70%"
+---
+
+```{r setup}
+options(
+  knitr.table.format = "html",
+  scipen = 999
+)
+```
+
+```{=html}
+<div style="position:absolute; top:10px; right:10px;">
+<img src="Logo_ut.png" width="150">
+</div>
+```
+
+```{=html}
+<style>
+body{
+  background-color:#f7f6ed;
+  font-size:130%;
+  text-align:justify;
+}
+</style>
+```
+
+# .Cargar paquetes
+
+```{r}
+ipak <- function(pkg){
+
+  options(repos = c(CRAN="https://cloud.r-project.org"))
+
+  new.pkg <- pkg[!(pkg %in% rownames(installed.packages()))]
+
+  if(length(new.pkg)) install.packages(new.pkg, dependencies = TRUE)
+
+  invisible(lapply(pkg, function(p)
+    suppressPackageStartupMessages(library(p, character.only = TRUE))
+  ))
+}
+
+packages <- c("tidyverse","kableExtra","psych","readxl")
+
+ipak(packages)
+```
+
+# **INTRODUCCION**
+
+# Marco Teórico: Distribución de Frecuencias
+
+La **Distribución de Frecuencias** es un método estadístico diseñado para organizar y resumir un conjunto de datos brutos, permitiendo identificar la estructura y el comportamiento de una variable.
+
+## 1. Definiciones de Frecuencias
+
+Sea un conjunto de datos de tamaño $n$, donde existen $k$ valores distintos o clases representadas por $x_1, x_2, \dots, x_k$.
+
+### Frecuencia Absoluta ($f_i$)
+
+Es el número de veces que se repite el valor $x_i$ en la muestra. Se debe cumplir la propiedad de cierre: $$\sum_{i=1}^{k} f_i = n$$
+
+### Frecuencia Relativa ($h_i$)
+
+Representa la proporción de la muestra que corresponde a la i-ésima categoría: $$h_i = \frac{f_i}{n}$$ Donde la suma de todas las frecuencias relativas es igual a la unidad: $\sum_{i=1}^{k} h_i = 1$.
+
+### Frecuencia Absoluta Acumulada ($F_i$)
+
+Suma de las frecuencias absolutas desde el primer dato hasta la posición $i$: $$F_i = \sum_{j=1}^{i} f_j$$
+
+### Frecuencia Relativa Acumulada ($H_i$)
+
+Proporción acumulada de los datos hasta el intervalo o valor $i$: $$H_i = \frac{F_i}{n} = \sum_{j=1}^{i} h_j$$
+
+------------------------------------------------------------------------
+
+## 2. Construcción de Intervalos para Variables Continuas
+
+Para variables continuas (como los puntajes obtenidos), los datos se agrupan en intervalos de clase siguiendo estos criterios:
+
+### Rango ($R$)
+
+Diferencia entre el valor máximo y el mínimo del conjunto de datos: $$R = x_{max} - x_{min}$$
+
+### Número de Intervalos ($k$)
+
+Calculado comúnmente mediante la **Regla de Sturges**: $$k = 1 + 3.322 \log_{10}(n)$$
+
+### Amplitud del Intervalo ($A$)
+
+Determina el ancho de cada clase: $$A = \frac{R}{k}$$
+
+### Marca de Clase ($x_i$)
+
+Es el valor representativo de cada intervalo $[L_{inf}, L_{sup})$: $$x_i = \frac{L_{inf} + L_{sup}}{2}$$
+
+------------------------------------------------------------------------
+
+| Col1 | Col2 | Col3 |
+|------|------|------|
+|      |      |      |
+|      |      |      |
+|      |      |      |
+
+## 3. Resumen de Propiedades Matemáticas
+
+| Concepto                    | Símbolo | Definición        |
+|:----------------------------|:-------:|:------------------|
+| **Frecuencia Absoluta**     |  $f_i$  | Conteo directo    |
+| **Frecuencia Relativa**     |  $h_i$  | $f_i / n$         |
+| **Frecuencia Porcentual**   |  $p_i$  | $h_i \cdot 100\%$ |
+| **Relación de Acumulación** |  $F_i$  | $F_{i-1} + f_i$   |
+
+title: "Tablas de Frecuencia" output: html_document ---
+
+```{r}
+# Librerías
+library(readxl)
+library(dplyr)
+library(tibble)
+library(knitr)
+library(kableExtra)
+
+# Cargar datos
+datos <- read_excel(file.choose())
+```
+
+# #Tabla de Genero
+
+```{r}
+tabla_genero <- tibble(datos = datos$Genero) %>%
+  group_by(datos) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_genero %>%
+  kable(col.names = c("Genero","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+```
+
+# \# Tabla Nivel Educativo
+
+```{r}
+tabla_nivel <- tibble(datos = datos$Nivel_Educativo) %>%
+  group_by(datos) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_nivel %>%
+  kable(col.names = c("Nivel Educativo","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+```
+
+# \# Tabla Estrato
+
+```{r}
+tabla_estrato <- tibble(datos = datos$Estrato) %>%
+  group_by(datos) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_estrato %>%
+  kable(col.names = c("Estrato","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+```
+
+# \# Tabla Tecnología
+
+```{r}
+tabla_tecnologia <- tibble(datos = datos$Tecnologia) %>%
+  group_by(datos) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_tecnologia %>%
+  kable(col.names = c("Tecnologia","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+```
+
+# \# Tabla Satisfacción
+
+```{r}
+tabla_satisfaccion <- tibble(datos = datos$Satisfaccion) %>%
+  group_by(datos) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_satisfaccion %>%
+  kable(col.names = c("Satisfaccion","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+```
+
+# #CURSOS
+
+```{r}
+tabla_cursos <- datos %>%
+  count(Cursos) %>%
+  mutate(
+    hi = round(n/sum(n), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_cursos %>%
+  kable(col.names = c("Cursos","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+```
+
+# #HORAS (con intervalos)
+
+```{r}
+intervalos_horas <- cut(datos$Horas, breaks = 5)
+
+tabla_horas <- tibble(Intervalo = intervalos_horas) %>%
+  group_by(Intervalo) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_horas %>%
+  kable(col.names = c("Intervalo","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+```
+
+# #PROMEDIO (con intervalos)
+
+```{r}
+
+intervalos_promedio <- cut(datos$Promedio, breaks = 5)
+
+tabla_promedio <- tibble(Intervalo = intervalos_promedio) %>%
+  group_by(Intervalo) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_promedio %>%
+  kable(col.names = c("Intervalo","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+```
+
+# \# ASISTENCIA (con intervalos)
+
+```{r}
+intervalos_asistencia <- cut(datos$`Asistencia (%)`, breaks = 5)
+
+tabla_asistencia <- tibble(Intervalo = intervalos_asistencia) %>%
+  group_by(Intervalo) %>%
+  summarise(fi = n()) %>%
+  mutate(
+    hi = round(fi/sum(fi), 4),
+    Porcentaje = paste0(hi*100, "%")
+  )
+
+tabla_asistencia %>%
+  kable(col.names = c("Intervalo","fi","hi","Porcentaje"),
+        align = "c") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+```
+
+# #GRAFICA DE GENERO
+
+```{r}
+ggplot(tabla_genero, aes(x = datos, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Genero",
+       x = "Genero",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# #GRAFICA NIVEL EDUCATIVO
+
+```{r}
+ggplot(tabla_nivel, aes(x = datos, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Nivel Educativo",
+       x = "Nivel Educativo",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# #GRAFICA ESTRATO
+
+```{r}
+ggplot(tabla_estrato, aes(x = datos, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Estrato",
+       x = "Estrato",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# #TECNOLOGIA
+
+```{r}
+ggplot(tabla_tecnologia, aes(x = datos, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Tecnologia",
+       x = "Tecnologia",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# #GRAFICA DE SASTIFACCION
+
+```{r}
+ggplot(tabla_satisfaccion, aes(x = datos, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Satisfaccion",
+       x = "Satisfaccion",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# \# GRAFICA CURSOS
+
+```{r}
+ggplot(tabla_cursos, aes(x = Cursos, y = n)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Cursos",
+       x = "Cursos",
+       y = "Frecuencia") +
+  theme_minimal()
+```
+
+# \# GRAFICA DE HORAS
+
+```{r}
+ggplot(tabla_horas, aes(x = Intervalo, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Horas",
+       x = "Intervalos",
+       y = "Frecuencia") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+# #GRAFICA PROMEDIO
+
+```{r}
+ggplot(tabla_promedio, aes(x = Intervalo, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Promedio",
+       x = "Intervalos",
+       y = "Frecuencia") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+# \# GRAFICA ASISTENCIAS
+
+```{r}
+ggplot(tabla_asistencia, aes(x = Intervalo, y = fi)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Asistencia",
+       x = "Intervalos",
+       y = "Frecuencia") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+
+```
